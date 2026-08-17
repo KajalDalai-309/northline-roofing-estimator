@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 import { connectDB } from './config/db.js';
 import { seedDatabase } from './config/seedRunner.js';
 import apiRouter from './routes/api.js';
@@ -38,6 +39,24 @@ app.get('/health', (req, res) => {
 // Mount REST API routes
 app.use('/api', apiRouter);
 
+// --- Frontend Serving (Bulletproof fallback) ---
+const clientDistPath = path.join(__dirname, '../../client/dist');
+
+if (fs.existsSync(clientDistPath)) {
+  // Serve static files from the React build
+  app.use(express.static(clientDistPath));
+
+  // Catch-all route to serve index.html for React Router
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(clientDistPath, 'index.html'));
+  });
+}
+
+// Global 404 Handler (Runs only if API didn't match AND static frontend didn't match/exist)
+app.use((req, res) => {
+  res.status(404).json({ error: `Route ${req.originalUrl} not found.` });
+});
+
 // Global Error Handler
 app.use((err, req, res, next) => {
   console.error('[Unhandled Error]:', err.stack);
@@ -46,29 +65,6 @@ app.use((err, req, res, next) => {
     message: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
-
-// 404 Handler
-app.use((req, res) => {
-  res.status(404).json({ error: `Route ${req.originalUrl} not found.` });
-});
-
-// ... (API Routes above)
-
-// --- Production Frontend Serving ---
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the React build
-  app.use(express.static(path.join(__dirname, '../../client/dist')));
-
-  // Catch-all route to serve index.html for React Router
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../client/dist/index.html'));
-  });
-} else {
-  // 404 Handler for API (Development mode only)
-  app.use((req, res) => {
-    res.status(404).json({ error: `Route ${req.originalUrl} not found.` });
-  });
-}
 
 // Start Server after connecting to Database and auto-verifying seed
 async function startServer() {
