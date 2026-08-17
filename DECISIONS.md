@@ -78,6 +78,8 @@ During database migration, engine testing, and rigorous QA, several real-world q
 
 ## 6. What I Would Build Next (Given Another Week)
 
+- **Admin Password Management (Self-Serve Security):** Currently, admin credentials are in the `.env` file. If the bookkeeper (Marcus) leaves the company, the non-technical owner (Dale) would have to contact the developer to change the password. Given more time, I would migrate authentication to MongoDB (using bcrypt) and build a "Change Password" UI in the portal so Dale can securely manage access himself.
+- **Audit Log Pagination:** Currently, the API limits the audit history to the 20 most recent versions to prevent UI bloat. I would implement cursor-based pagination (Next/Previous) or infinite scroll so the owner can seamlessly browse all historical changes without querying the database directly.
 - **Outbound Webhook Dispatcher:** Trigger real-time webhooks on new lead capture to push directly into Dale's CRM (Jobber / ServiceTitan).
 - **Interactive Visual Roof Customizer:** A 2D/3D visual preview letting homeowners see what standing seam metal vs architectural shingles look like on a home facade.
 - **Automated PDF Estimate Download:** Generate a branded PDF estimate quote with Northline Roofing letterhead that the homeowner can download or print.
