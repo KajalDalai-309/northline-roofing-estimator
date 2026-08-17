@@ -54,12 +54,15 @@ In a 24-hour sprint, shipping a reliable, bug-free core flow is far more valuabl
 
 ---
 
-## 4. Seed Data Anomalies & Edge Cases Handled
+## 4. Edge Cases, UX Polish & Anomalies Handled
 
-During database migration and engine testing, several real-world data quirks were identified and addressed:
+During database migration, engine testing, and rigorous QA, several real-world quirks and UX flaws were identified and addressed:
 - **String Float Multipliers:** In the seed configuration (Version 3), the medium pitch multiplier was formatted as a string (`"1.12"`). The calculation engine and schema parser normalize all incoming values with `Number()` to prevent string concatenation bugs.
 - **Legacy Lead Schema Differences:** Seed lead `ld_0917` (Version 1) contained discontinued fields (`chimney_count`, `gutter_replace`). The `Lead` schema uses `mongoose.Schema.Types.Mixed` for `answers`, enabling the Owner Panel to render legacy answers seamlessly without migration errors.
 - **Out-of-Bounds Area Entries:** Boundary validation enforces $300 \le \text{roof\_area} \le 12,000$ sq ft, preventing negative numbers or unrealistic industrial dimensions.
+- **Disabled Question Progress Logic:** Identified a UX bug where the public wizard counted disabled questions in the "Step X of Y" progress counter. Refactored the step calculation to filter and count explicitly active questions only.
+- **Native CSV Export:** Browser security often blocks `blob:` URL downloads on managed business networks. Engineered a native `File System Access API` (`showSaveFilePicker`) fallback to ensure reliable frontend CSV generation.
+- **Audit Snapshot Viewer:** To ensure non-technical owners (Dale/Marcus) can actually understand the Version Audit History, replaced the raw JSON payload viewer with a clean, human-readable React component that translates modifiers and rate changes into simple terms.
 
 ---
 

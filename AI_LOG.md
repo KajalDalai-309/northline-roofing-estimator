@@ -36,6 +36,12 @@ I diagnosed the issue by inspecting the API response payload against the compone
 1. Updated `getPublicConfig` in the backend controller to explicitly preserve `active: true`.
 2. Hardened `DynamicField.jsx` to check `if (!question || question.active === false) return null;` so that questions missing explicit boolean tags still render gracefully by default.
 
+### Secondary Human QA Interventions (AI Blind Spots):
+While the AI generated functional code, it consistently missed human-centric UX logic:
+1. **Ghost Steps in Progress Bar:** The AI calculated total wizard steps using `config.questions.length`, entirely ignoring that disabled questions shouldn't count. I manually injected a `filter(q => q.active)` interceptor.
+2. **Editable Disabled States:** In the Admin Panel, the AI successfully built the "Disable" toggle, but left the actual rate inputs fully editable. I manually wrapped inactive question blocks in `pointer-events-none opacity-40` logic to prevent accidental edits.
+3. **Save Button Spam:** The AI allowed the `Save & Publish` button to unconditionally generate new Audit Versions even if no data changed. I implemented a deep `JSON.stringify` comparison block to protect the audit log from unchanged spam.
+
 ---
 
 ## 4. Components Authored & Substantially Refactored Directly
