@@ -36,26 +36,76 @@ export default function LeadsCRM() {
     return nameMatch || emailMatch || phoneMatch || idMatch;
   });
 
-  // Handle CSV Download
+  // Handle CSV Download - generate directly from loaded leads data (no blob fetch needed)
   const handleExportCSV = async () => {
-    try {
-      const token = getAuthToken();
-      const res = await fetch('/api/admin/leads/export-csv', {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      if (!res.ok) throw new Error('Failed to generate CSV');
-      const blob = await res.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `northline_leads_${new Date().toISOString().slice(0, 10)}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch (err) {
-      alert('CSV Export Error: ' + err.message);
+    if (leads.length === 0) {
+      alert('No leads to export yet.');
+      return;
     }
+
+    const escapeCsv = (val) => {
+      if (val === null || val === undefined) return '""';
+      return `"${String(val).replace(/"/g, '""')}"`;
+    };
+
+    const headers = [
+      'Lead ID', 'Date Captured', 'Config Version',
+      'Customer Name', 'Phone', 'Email',
+      'Estimate Low ($)', 'Estimate High ($)',
+      'Roof Area (sq ft)', 'Material', 'Pitch', 'Layers', 'Stories'
+    ];
+
+    const rows = leads.map((lead) => {
+      const ans = lead.answers || {};
+      return [
+        escapeCsv(lead.lead_id),
+        escapeCsv(lead.captured_at ? new Date(lead.captured_at).toLocaleString() : ''),
+        escapeCsv(lead.config_version),
+        escapeCsv(lead.name),
+        escapeCsv(lead.phone),
+        escapeCsv(lead.email),
+        escapeCsv(lead.estimate_low),
+        escapeCsv(lead.estimate_high),
+        escapeCsv(ans.roof_area || ''),
+        escapeCsv(ans.material || ''),
+        escapeCsv(ans.pitch || ''),
+        escapeCsv(ans.layers || ''),
+        escapeCsv(ans.stories || '')
+      ].join(',');
+    });
+
+    const csvContent = [headers.join(','), ...rows].join('\r\n');
+    const csvWithBOM = '\uFEFF' + csvContent;
+    const filename = `northline_leads_${new Date().toISOString().slice(0, 10)}.csv`;
+
+    // Try native Save As dialog (File System Access API)
+    if (window.showSaveFilePicker) {
+      try {
+        const handle = await window.showSaveFilePicker({
+          suggestedName: filename,
+          types: [{ description: 'CSV Files', accept: { 'text/csv': ['.csv'] } }]
+        });
+        const writable = await handle.createWritable();
+        await writable.write(csvWithBOM);
+        await writable.close();
+        return;
+      } catch (e) {
+        // User cancelled dialog — do nothing
+        if (e.name === 'AbortError') return;
+      }
+    }
+
+    // Fallback: data URI download
+    const dataUri = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvWithBOM);
+    const link = document.createElement('a');
+    link.setAttribute('href', dataUri);
+    link.setAttribute('download', filename);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
+
 
   const toggleExpand = (id) => {
     setExpandedLeadId(expandedLeadId === id ? null : id);

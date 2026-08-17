@@ -4,6 +4,7 @@ import { fetchAdminConfig, saveAdminConfig } from '../../services/api';
 
 export default function RatesEditor({ onConfigSaved }) {
   const [config, setConfig] = useState(null);
+  const [originalDataStr, setOriginalDataStr] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(null);
@@ -17,6 +18,7 @@ export default function RatesEditor({ onConfigSaved }) {
     try {
       const data = await fetchAdminConfig();
       setConfig(data);
+      setOriginalDataStr(JSON.stringify({ q: data.questions, m: data.modifiers }));
     } catch (err) {
       setError(err.message || 'Failed to load configuration.');
     } finally {
@@ -92,9 +94,17 @@ export default function RatesEditor({ onConfigSaved }) {
     setSaveSuccess(null);
 
     try {
+      const currentDataStr = JSON.stringify({ q: config.questions, m: config.modifiers });
+      if (currentDataStr === originalDataStr) {
+        alert("No changes detected. You are already on the latest version.");
+        setSaving(false);
+        return;
+      }
+
       const summary = changeSummary.trim() || 'Updated pricing rates and options';
       const updated = await saveAdminConfig(config, summary);
       setConfig(updated);
+      setOriginalDataStr(JSON.stringify({ q: updated.questions, m: updated.modifiers }));
       setSaveSuccess(`Version ${updated.config_version} is now live! Customers will see updated rates immediately.`);
       setChangeSummary('');
       if (onConfigSaved) onConfigSaved(updated);
@@ -258,14 +268,6 @@ export default function RatesEditor({ onConfigSaved }) {
             {/* Question Header & Active Toggle */}
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
               <div className="flex-1 w-full">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-                    key: {q.key}
-                  </span>
-                  <span className="text-xs font-semibold uppercase text-sky-600 bg-sky-50 px-2 py-0.5 rounded">
-                    type: {q.type}
-                  </span>
-                </div>
                 <input
                   type="text"
                   value={q.label}
@@ -291,8 +293,9 @@ export default function RatesEditor({ onConfigSaved }) {
               </div>
             </div>
 
-            {/* Type: Number Configuration */}
-            {q.type === 'number' && (
+            <div className={!q.active ? 'pointer-events-none opacity-40 grayscale select-none' : ''}>
+              {/* Type: Number Configuration */}
+              {q.type === 'number' && (
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">Unit Label</label>
@@ -418,6 +421,7 @@ export default function RatesEditor({ onConfigSaved }) {
                 </button>
               </div>
             )}
+            </div>
           </div>
         ))}
       </div>

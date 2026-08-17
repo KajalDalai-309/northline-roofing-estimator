@@ -40,7 +40,8 @@ export default function EstimatorWizard({ onConfigLoaded }) {
     loadConfiguration();
   }, []);
 
-  const activeQuestions = config?.questions || [];
+  // Only include questions that are explicitly active
+  const activeQuestions = config?.questions?.filter(q => q.active) || [];
   const totalSteps = activeQuestions.length + 1; // questions + contact step
   const isContactStep = currentStepIndex === activeQuestions.length;
   const currentQuestion = activeQuestions[currentStepIndex];
@@ -299,6 +300,15 @@ export default function EstimatorWizard({ onConfigLoaded }) {
           <span>Instant Calculation</span>
         </div>
       </div>
+
+      {/* Version Badge */}
+      {config?.version && (
+        <div className="mt-6 text-center">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-100 text-[10px] font-mono text-slate-400 border border-slate-200/60 shadow-sm" title="Active Pricing Formula Version">
+             Pricing Engine: v{config.version}
+          </span>
+        </div>
+      )}
 
     </div>
   );

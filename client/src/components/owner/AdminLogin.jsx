@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { Lock, User, Key, ArrowRight, ShieldCheck, AlertCircle } from 'lucide-react';
+import { Lock, User, Key, ArrowRight, ShieldCheck, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import { loginAdmin } from '../../services/api';
 
 export default function AdminLogin({ onLoginSuccess }) {
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('roofing2026!');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -40,14 +41,7 @@ export default function AdminLogin({ onLoginSuccess }) {
           </p>
         </div>
 
-        {/* Demo Credentials Helper Pill */}
-        <div className="mb-6 p-3.5 bg-slate-50 rounded-2xl border border-slate-200 text-xs text-slate-600">
-          <span className="font-bold text-slate-800 block mb-1">Pre-filled Review Credentials:</span>
-          <div className="flex justify-between font-mono text-[11px] text-sky-700">
-            <span>User: <strong>admin</strong></span>
-            <span>Pass: <strong>roofing2026!</strong></span>
-          </div>
-        </div>
+
 
         {/* Error Alert */}
         {error && (
@@ -86,12 +80,19 @@ export default function AdminLogin({ onLoginSuccess }) {
                 <Key className="w-4 h-4" />
               </div>
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full pl-10 pr-4 py-3 text-sm font-medium rounded-xl border border-slate-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition"
+                className="w-full pl-10 pr-10 py-3 text-sm font-medium rounded-xl border border-slate-300 focus:border-sky-500 focus:ring-4 focus:ring-sky-100 transition"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600"
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
             </div>
           </div>
 
