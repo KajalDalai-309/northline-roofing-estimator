@@ -1,0 +1,24 @@
+{
+  "name": "northline-roofing-server",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Backend API & Pricing Engine for Northline Roofing & Exteriors",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js",
+    "seed": "node src/config/seedRunner.js",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4",
+    "vitest": "^1.6.0"
+  }
+}
