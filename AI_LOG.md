@@ -7,9 +7,9 @@
 ---
 
 ## 1. AI Tools Utilized
-- **Antigravity / Gemini Agentic Assistant:** Used for rapid scaffolding of Mongoose models, Vitest test suite creation, and Tailwind CSS utility component styling.
+- **ChatGPT (GPT-4) & Claude 3.5 Sonnet:** Used for rapid scaffolding of Mongoose models, Vitest test suite logic, and Tailwind CSS utility component styling.
 - **Node.js & Vitest CLI:** Used directly to run unit tests and verify mathematical precision.
-- **Browser Automation Subagent:** Used to simulate real end-to-end user and admin sessions, verifying zero client-side calculation leaks.
+- **Manual QA & Console Debugging:** Used to simulate real end-to-end user and admin sessions, verifying zero client-side calculation leaks.
 
 ---
 

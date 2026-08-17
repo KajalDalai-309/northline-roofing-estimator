@@ -51,6 +51,7 @@ In a 24-hour sprint, shipping a reliable, bug-free core flow is far more valuabl
 1. **Complex Multi-Tenancy / RBAC:** The brief specified Dale (owner) and Marcus (bookkeeper). A unified owner portal with a single admin role fulfills all operational needs without introducing database schema complexity.
 2. **Live Payment Gateway (Stripe/PayPal):** Roofing jobs are high-ticket ($10k-$40k) and require an on-site physical inspection before contract signing. Collecting payments online at estimation stage would cause customer drop-off.
 3. **Satellite Imagery AI / Roof Measurement API:** While Google Maps or Roofr APIs can measure roofs, introducing third-party API dependencies with paid credits would create failure points during assessment review. Manual input with intuitive size presets was the robust choice.
+4. **"Forgot Password" Feature & DB User Table:** Because this is a single-tenant MVP, credentials are securely managed via server environment variables (`.env`) rather than a database table. Adding a "Forgot Password" flow would require an email service (SendGrid), token generation, and a dedicated Users schema, which is over-engineering for this phase.
 
 ---
 
