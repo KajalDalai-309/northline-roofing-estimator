@@ -3,7 +3,7 @@ import NumberField from './NumberField';
 import SelectField from './SelectField';
 
 export default function DynamicField({ question, value, onChange, error }) {
-  if (!question || !question.active) return null;
+  if (!question || question.active === false) return null;
 
   switch (question.type) {
     case 'number':
